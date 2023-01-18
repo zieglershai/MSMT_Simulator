@@ -71,7 +71,7 @@ class Scheduler(object):
         after configuration set, create thread objects
         :return:
         """
-        trace_folder = self.config["trace_folder_path"]
+        trace_folder = os.path.expanduser(self.config["trace_folder_path"])
         priority_threads = list(self.config["priority_thread"])
 
         counter = 0
@@ -79,12 +79,12 @@ class Scheduler(object):
             for j in range(self.config["threads"]["thread_type"]):
                 trace = os.path.join(trace_folder, thread_type + ".pkl")
                 if thread_type in priority_threads:
-                    thread = Thread(trace, self.config["priority_window_size"])
+                    thread = Thread(trace, self.config["priority_window_size"], self.clock)
                     self.threads.append(thread)
                     priority_threads.remove(thread_type)
                     self.priority_thread_indexes.append(counter)
                 else:
-                    thread = Thread(trace, self.config["window_size"])
+                    thread = Thread(trace, self.config["window_size"], self.clock)
                     self.threads.append(thread)
                 counter += 1
 

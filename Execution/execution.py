@@ -67,4 +67,3 @@ class Execution(object):
         self.alus = [i-1 for i in self.alus if i > 0]
         self.ldsts = [i-1 for i in self.ldsts if i > 0]
         self.branches = [i-1 for i in self.branches if i > 0]
-
