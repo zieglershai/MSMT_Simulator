@@ -1,11 +1,18 @@
+import pickle
 
 
 class Thread(object):
-    def __init__(self):
+    def __init__(self, trace_df_path: str, window_size: int):
         """
         This is a thread object
+        :param trace_df_path: path to a pickle with the parsed instructions in a DF
         """
-        pass
+        self.window_size = window_size
+        with open(trace_df_path, 'rb') as f:
+            self.instructions = pickle.load(f)
+        self.final_cycle = None
+        self.instruction = 0
+        self.total_instructions = len(self.instructions.index)
 
     def get_unexecuted_instructions(self):
         """
@@ -21,7 +28,7 @@ class Thread(object):
         """
         pass
 
-    def execute_instruction(self):
+    def set_instruction_finish_cycle(self, instruction_id, instruction_cycles):
         """
         set instruction run cycle
         :return: boolean of true or false
@@ -34,3 +41,6 @@ class Thread(object):
         :return:
         """
         pass
+
+    def get_progress(self):
+        return 100 * self.instructions / float(self.total_instructions)

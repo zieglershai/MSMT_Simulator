@@ -1,0 +1,17 @@
+{
+  "alu": {"time": 1, "count:":  4},
+  "branch": {"time": 1, "count:":  4},
+  "ldst": {"time": 10, "count:":  4},
+  "cache_miss": 0.5,
+  "branch_miss": 0.5,
+  "branch_penalty": 5,
+  "cache_time": 5,
+  "mem_penalty": 100,
+  "window_size": 4,
+  "priority_window_size": 4,
+  "threads": {"deepsjeng_count": 4, "fotonik3d": 4, "gcc": 4, "mcf": 4, "perl": 4, "x264": 4},
+  "policy": "RR",
+  "policy_params": {"quanta": 10},
+  "priority_thread": ["deepsjeng_count"],
+  "trace_folder_path": "~/Downloads/traces/"
+}
