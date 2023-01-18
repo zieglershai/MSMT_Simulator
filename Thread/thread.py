@@ -1,5 +1,5 @@
 import pickle
-from constants import ROW_ID, FINISH_CYCLE
+from constants import ROW_ID, FINISH_CYCLE, REAG_REG_A, READ_REG_B, WRITE_REG
 from Clock.clock import Clock
 
 
@@ -22,7 +22,21 @@ class Thread(object):
         get a df of instructions that need to run
         :return:
         """
-        instruction_window = self.instructions.loc[(self.instruction, self.instruction + self.window_size), :]
+        instruction_window = self.instructions.loc[self.instruction, self.instruction + self.window_size].copy()
+        write_regs = set()
+        # TODO: make sure that we are in-order within the window
+        commands = -1
+        for i, row in instruction_window.iterrows():
+            commands += 1
+            if row[REAG_REG_A] in write_regs or row[READ_REG_B] in write_regs:
+                break
+            if row[WRITE_REG] is not None:
+                write_regs.add(row[WRITE_REG])
+
+        instruction_window = instruction_window.loc[self.instruction, self.instruction + commands]
+        # TODO: make sure this works
+        instruction_window = instruction_window[instruction_window[FINISH_CYCLE] is None]
+
         return instruction_window
 
     def step(self):
@@ -30,6 +44,7 @@ class Thread(object):
         run cycle step
         :return:
         """
+        # TODO: make sure this works
         self.instruction = self.instructions[(self.instructions[FINISH_CYCLE] is not None) &
                                              (self.instructions[FINISH_CYCLE] < self.clock.get_cycle())].iloc[0]
 
