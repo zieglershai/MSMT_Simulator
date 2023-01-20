@@ -16,6 +16,7 @@ LWSW_OP = ["movzx", "pcmpeqb", "mov", "pop", "movq", "cmovb", "movsx", "cmovbe",
            "movsxd", "movdqa", "movups", "movlpd", "movhpd", "push", ]
 # TODO: is jmp a conditional jmp or not?
 # TODO: what is the type of rdtsc ()read time stamp
+# TODO: stosb is displaying a lot in deep trc should we ignore it?
 
 
 def main():
@@ -53,6 +54,23 @@ def main():
             if "xmmword" in words:
                 words.remove("xmmword")
             if words[1] == "ret":
+                continue
+
+            if words[2] == "stosb":
+                # continue
+                if "byte" == words[3]:
+                    read_reg_a = "al"
+                if "word" == words[3]:
+                    read_reg_a = "ax"
+                if "dword " == words[3]:
+                    read_reg_a = "eax"
+
+                read_reg_b = "ax"
+                inst_type = InstructionType.LDST
+                new_row = {ROW_ID: row_id, READ_REG_A: read_reg_a, READ_REG_B: read_reg_b,
+                           WRITE_REG: inst_write_reg, INSTRUCTION_TYPE: inst_type}
+                df = df.append(new_row, ignore_index=True)
+                row_id += 1
                 continue
             # find the type of the instruction
             if line == previous_line:  # the last inst went to the mem, now to the calc part
