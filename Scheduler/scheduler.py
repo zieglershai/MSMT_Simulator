@@ -32,9 +32,9 @@ class Scheduler(object):
         :return:
         """
         policy_string = self.config["policy"]
-        if policy_string == PolicyType.RR:
+        if policy_string == PolicyType.RR.name:
             self.policy = RoundRobbin(self.thread_count, self.config["policy_params"]["quanta"], self.clock)
-        elif policy_string == PolicyType.PRR:
+        elif policy_string == PolicyType.PRR.name:
             pass
         else:
             raise PolicyTypeError("requested policy doesn't exist")
@@ -76,7 +76,7 @@ class Scheduler(object):
 
         counter = 0
         for thread_type in self.config["threads"]:
-            for j in range(self.config["threads"]["thread_type"]):
+            for j in range(self.config["threads"][thread_type]):
                 trace = os.path.join(trace_folder, thread_type + ".pkl")
                 if thread_type in priority_threads:
                     thread = Thread(trace, self.config["priority_window_size"], self.clock)
@@ -87,6 +87,7 @@ class Scheduler(object):
                     thread = Thread(trace, self.config["window_size"], self.clock)
                     self.threads.append(thread)
                 counter += 1
+        self.thread_count = counter
 
     def step(self):
         """

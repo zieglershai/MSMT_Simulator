@@ -2,7 +2,7 @@ from Clock.clock import Clock
 
 
 class Policy(object):
-    def __init__(self, clock: Clock = None):
+    def __init__(self, clock: Clock):
         """
         the main policy type
         """

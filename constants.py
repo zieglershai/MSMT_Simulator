@@ -9,8 +9,8 @@ class InstructionType(Enum):
 
 
 class PolicyType(Enum):
-    RR = "RR"
-    PRR = "PRR"
+    RR = 1
+    PRR = 2
 
 
 class InstructionError(Exception):
