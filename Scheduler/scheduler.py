@@ -137,7 +137,7 @@ class Scheduler(object):
             if self.clock.get_cycle() % 1000 == 0:
                 print(f"clock is at cycle {self.clock.get_cycle()}")
                 for i in range(self.thread_count):
-                    print(f"thread {i} progress: {self.threads[i].get_progress()}%.2f")
+                    print(f"thread {i} progress: {self.threads[i].get_progress():.2f}")
 
         for i, thread in enumerate(self.threads):
             print(f"thread {i} finished after {thread.final_cycle}")

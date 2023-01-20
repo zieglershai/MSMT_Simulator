@@ -49,8 +49,15 @@ class Thread(object):
         :return:
         """
         # TODO: make sure this works
-        self.instruction = self.instructions[(self.instructions[FINISH_CYCLE] == -1) |
+        try:
+            self.instruction = self.instructions[(self.instructions[FINISH_CYCLE] == -1) |
                                              (self.instructions[FINISH_CYCLE] > self.clock.get_cycle())].iloc[0][ROW_ID]
+        except IndexError:
+            assert(len(self.instructions[(self.instructions[FINISH_CYCLE] != -1) &
+                                         (self.instructions[FINISH_CYCLE] <= self.clock.get_cycle())]) ==
+                   self.total_instructions,
+                   "Index error even though not empty")
+            self.instruction = self.total_instructions
 
     def set_instruction_finish_cycle(self, instruction_id, instruction_cycles):
         """
@@ -67,7 +74,7 @@ class Thread(object):
         check if all instructions have run
         :return:
         """
-        return self.instruction + 1 == self.total_instructions
+        return self.instruction == self.total_instructions
 
     def get_progress(self):
         return 100 * self.instruction / float(self.total_instructions)
