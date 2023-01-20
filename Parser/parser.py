@@ -59,7 +59,7 @@ def main():
             if words[1] == "ret":
                 continue
 
-            if words[2] == "stosb":
+            if "stosb" in words:
                 # continue
                 if "byte" == words[3]:
                     read_reg_a = "al"
