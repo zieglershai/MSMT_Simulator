@@ -7,7 +7,7 @@ from constants import InstructionType
 from tqdm import tqdm
 import warnings
 
-ALU_OP = ["shl", "bt", "punpcklbw", "mov", "setz", "rol", "por", "psrldq", "cmovb", "cmovbe", "setbe", "punpcklwd", "pminub",
+ALU_OP = ["shl", "bt", "cpuid", "punpcklbw", "mov", "setz", "rol", "por", "psrldq", "cmovb", "cmovbe", "setbe", "punpcklwd", "pminub",
           "not", "pshufd", "pcmpeqb", "sbb", "imul", "mul", "cmovnz", "setnz", "cmovz", "xchg", "sar", "cdqe", "rdtsc",
           "shr", "add", "bsf", "pmovmskb", "psubb", "pslldq", "shl", "pcmpeqb", "or", "test", "lea", "add", "pxor",
           "sub", "and", "cmp", "xor", "neg", "movq", "cmovb", "movsx", "cmovbe", "movaps", "movlpd", "movdqu", "movd",
@@ -30,7 +30,7 @@ def main():
 
     previous_line = ""
     row_id = 0
-
+    chunk_counter = 0
     with open(trc_path) as f:
         num_lines = len(f.readlines())
 
@@ -136,9 +136,17 @@ def main():
                 df = df.append(new_row, ignore_index=True)
                 row_id += 1
             previous_line = line
-    with open(trc_path.replace("trc","pkl"), "wb") as f:
+
+            if row_id % 10000 == 9999:
+                with open(trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
+                    df.set_index(ROW_ID)
+                    pickle.dump(df, data_f)
+                chunk_counter += 1
+                df.drop
+                df = pd.DataFrame(columns=[ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE])
+    with open(trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
         df.set_index(ROW_ID)
-        pickle.dump(df, f)
+        pickle.dump(df, data_f)
 
 
 def extract_reg(string: str, arr: list):
