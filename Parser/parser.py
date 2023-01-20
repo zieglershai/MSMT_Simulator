@@ -5,6 +5,7 @@ import os
 from constants import ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE
 from constants import InstructionType
 from tqdm import tqdm
+import warnings
 
 ALU_OP = ["shl", "bt", "punpcklbw", "mov", "setz", "rol", "por", "psrldq", "cmovb", "cmovbe", "setbe", "punpcklwd", "pminub",
           "not", "pshufd", "pcmpeqb", "sbb", "imul", "mul", "cmovnz", "setnz", "cmovz", "xchg", "sar", "cdqe", "rdtsc",
@@ -25,6 +26,8 @@ def main():
     assert os.path.exists(trc_path)  # check there is such file
     df = pd.DataFrame(columns=[ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE])
     df.set_index(ROW_ID)
+
+    warnings.filterwarnings("ignore")
 
     previous_line = ""
     row_id = 0
