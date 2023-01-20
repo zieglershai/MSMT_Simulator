@@ -58,6 +58,7 @@ class Thread(object):
                    self.total_instructions,
                    "Index error even though not empty")
             self.instruction = self.total_instructions
+            self.final_cycle = self.clock.get_cycle()
 
     def set_instruction_finish_cycle(self, instruction_id, instruction_cycles):
         """

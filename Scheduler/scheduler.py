@@ -99,7 +99,8 @@ class Scheduler(object):
 
         # these currently pass
         for thread in self.threads:
-            thread.step()
+            if not thread.check_if_done():
+                thread.step()
         self.policy.step()
 
     def get_threads_by_priority(self):
