@@ -44,6 +44,10 @@ def main():
             same_line_as_before = False
             words = line.split()  # splits into known parts
             calc_inner_part = False
+
+            if len(words) <= 1:
+                continue
+
             # remove redundant words
             if "qword" in words:
                 words.remove("qword")
@@ -116,7 +120,7 @@ def main():
                                 read_reg_arr.append(word[:-1])
                         else:
                             read_reg_arr.append(word)
-            else:
+            elif words[2].find("[") == -1:  # if it is the same line as before that mean we will do the logic operation now
                 read_reg_arr.append(words[2][:-1])
 
             if len(read_reg_arr) == 2:
