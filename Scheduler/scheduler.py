@@ -123,7 +123,7 @@ class Scheduler(object):
         Main run loop
         :return:
         """
-        while self.check_if_all_threads_are_done():
+        while not self.check_if_all_threads_are_done():
             threads_for_cycle = self.policy.get_threads_by_priority()
             for thread_index in threads_for_cycle:
                 instructions = self.get_unexecuted_instruction_window_from_thread(thread_index)
@@ -134,10 +134,14 @@ class Scheduler(object):
                     if num_cycles != -1:
                         self.set_instruction_ran_on_thread(thread_index, instruction_id, num_cycles)
             self.step()
-            if self.clock.get_cycle() % 10000 == 0:
+            if self.clock.get_cycle() % 1000 == 0:
                 print(f"clock is at cycle {self.clock.get_cycle()}")
                 for i in range(self.thread_count):
-                    print(f"thread {i} progress: {self.threads[i].get_progress()}%")
+                    print(f"thread {i} progress: {self.threads[i].get_progress()}%.2f")
+
+        for i, thread in enumerate(self.threads):
+            print(f"thread {i} finished after {thread.final_cycle}")
+        print(f"total number of cycles: {self.clock.get_cycle()}")
 
     def get_unexecuted_instruction_window_from_thread(self, thread_index: int) -> pd.DataFrame:
         """

@@ -39,13 +39,13 @@ class Execution(object):
                 executed = self.alu_time
         elif instruction_type == InstructionType.LDST:
             miss = random() < self.cache_miss_rate
-            unit_time = self.ldsts_time if not miss else self.ldsts + self.mem_penalty
+            unit_time = self.ldsts_time if not miss else self.ldsts_time + self.mem_penalty
             if self.execute_for_unit(self.ldsts, self.ldsts_time):
                 # TODO: how much time to does the unit stop for?
                 executed = unit_time
         elif instruction_type == InstructionType.BRANCH:
             miss = random() < self.br_miss_rate
-            if self.execute_for_unit(self.br_miss_rate, self.br_time):
+            if self.execute_for_unit(self.branches, self.br_time):
                 executed = self.br_time if not miss else self.br_time + self.br_penalty
         else:
             raise InstructionError("bad instruction type!")
@@ -64,6 +64,6 @@ class Execution(object):
         run one cycle
         :return:
         """
-        self.alus = [i-1 for i in self.alus if i > 0]
-        self.ldsts = [i-1 for i in self.ldsts if i > 0]
-        self.branches = [i-1 for i in self.branches if i > 0]
+        self.alus = [i-1 if i > 0 else i for i in self.alus]
+        self.ldsts = [i-1 if i > 0 else i for i in self.ldsts]
+        self.branches = [i-1 if i > 0 else i for i in self.branches]
