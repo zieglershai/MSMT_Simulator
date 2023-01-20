@@ -138,14 +138,13 @@ def main():
             previous_line = line
 
             if row_id % 10000 == 9999:
-                with open(trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
-                    df.set_index(ROW_ID)
+                with open("output_trc/" + trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
+                    # df.set_index(ROW_ID)
                     pickle.dump(df, data_f)
                 chunk_counter += 1
-                df.drop
                 df = pd.DataFrame(columns=[ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE])
-    with open(trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
-        df.set_index(ROW_ID)
+    with open("output_trc/" + trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
+        # df.set_index(ROW_ID)
         pickle.dump(df, data_f)
 
 
