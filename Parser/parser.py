@@ -25,7 +25,6 @@ def main():
     trc_path = sys.argv[1]
     assert os.path.exists(trc_path)  # check there is such file
     df = pd.DataFrame(columns=[ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE])
-    df.set_index(ROW_ID)
 
     warnings.filterwarnings("ignore")
 
@@ -138,6 +137,7 @@ def main():
                 row_id += 1
             previous_line = line
     with open(trc_path.replace("trc","pkl"), "wb") as f:
+        df.set_index(ROW_ID)
         pickle.dump(df, f)
 
 
