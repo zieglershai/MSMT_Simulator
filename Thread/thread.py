@@ -16,6 +16,7 @@ class Thread(object):
             # self.instructions.set_index(ROW_ID)
         self.instructions[FINISH_CYCLE] = -1
         self.final_cycle = None
+        self.soe_ready_on = 0
         self.instruction = 0
         self.total_instructions = len(self.instructions.index)
 
@@ -26,14 +27,14 @@ class Thread(object):
         """
         instruction_window = self.instructions.loc[self.instruction: self.instruction + self.window_size-1].copy()
         write_regs = set()
-        # TODO: make sure that we are in-order within the window
+        # TODO: make sure that we are in-order within the window - Yes
         commands = 0
         for i, row in instruction_window.iterrows():
             commands += 1
-            # TODO: make sure we need to stop the window after LDST
+            # TODO: make sure we need to stop the window after LDST - No only on miss!!!
             if row[READ_REG_A] in write_regs or row[READ_REG_B] in write_regs or \
                     row[INSTRUCTION_TYPE] == InstructionType.LDST:
-                break
+                break  # Todo break only on miss
             if row[WRITE_REG] != "":
                 write_regs.add(row[WRITE_REG])
 
@@ -79,3 +80,18 @@ class Thread(object):
 
     def get_progress(self):
         return 100 * self.instruction / float(self.total_instructions)
+
+    def set_cache_miss(self, cycle):
+        """
+        set switch on event return time
+        :return:
+        """
+        self.soe_ready_on = self.clock.get_cycle() + cycle
+
+    def ready(self):
+        """
+
+        :return: true if the thread is ready
+        """
+        return self.soe_ready_on <= self.clock.get_cycle()
+

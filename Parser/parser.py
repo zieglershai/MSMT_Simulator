@@ -26,9 +26,9 @@ LWSW_OP = ["movzx", "pcmpeqb", "mov", "pop", "movq", "cmovb", "movsx", "cmovbe",
            "movsxd", "movdqa", "movups", "movlpd", "movhpd", "push", "fbld", "fbstp", "fbstp", "fcmovb", "fcmovbe",
            "fcmove", "fcmovnb", "fcmovnbe", "fcmovne", "fcmovnu", "fcmovu", "fild", "fist", "fistp", "fld", "fst",
            "fstp", "fxch"]
-# TODO: is jmp a conditional jmp or not?
-# TODO: what is the type of rdtsc ()read time stamp
-# TODO: stosb is displaying a lot in deep trc should we ignore it?
+# TODO: is jmp a conditional jmp or not? - No
+# TODO: what is the type of rdtsc ()read time stamp - nop
+# TODO: stosb is displaying a lot in deep trc should we ignore it? - store
 
 
 def main():

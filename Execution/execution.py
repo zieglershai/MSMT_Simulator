@@ -36,6 +36,7 @@ class Execution(object):
         :return: cycles to run command, -1 if no units are free
         """
         executed = -1
+        cache_miss = False
         if instruction_type == InstructionType.ALU:
             if self.execute_for_unit(self.alus, self.alu_time):
                 executed = self.alu_time
@@ -45,6 +46,7 @@ class Execution(object):
         elif instruction_type == InstructionType.LDST:
             miss = random() < self.cache_miss_rate
             unit_time = self.ldsts_time if not miss else self.ldsts_time + self.mem_penalty
+            cache_miss = miss
             if self.execute_for_unit(self.ldsts, self.ldsts_time):
                 # TODO: how much time to does the unit stop for?
                 executed = unit_time
@@ -54,7 +56,7 @@ class Execution(object):
                 executed = self.br_time if not miss else self.br_time + self.br_penalty
         else:
             raise InstructionError("bad instruction type!")
-        return executed
+        return executed, cache_miss
 
     @staticmethod
     def execute_for_unit(unit: list, latency: int):

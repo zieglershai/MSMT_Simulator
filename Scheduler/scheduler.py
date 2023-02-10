@@ -131,10 +131,13 @@ class Scheduler(object):
                 instructions = self.get_unexecuted_instruction_window_from_thread(thread_index)
                 for i, row in instructions.iterrows():
                     # -1 if not executed
-                    num_cycles = self.execute_instruction(row[INSTRUCTION_TYPE])
+                    num_cycles, cache_miss = self.execute_instruction(row[INSTRUCTION_TYPE])
                     instruction_id = row[ROW_ID]
                     if num_cycles != -1:
                         self.set_instruction_ran_on_thread(thread_index, instruction_id, num_cycles)
+                    if cache_miss:  # if there was a miss switch on event is required
+                        self.threads[thread_index].set_cache_miss(num_cycles)
+                        break
             self.step()
             if self.clock.get_cycle() % 1000 == 0:
                 print(f"clock is at cycle {self.clock.get_cycle()}")
