@@ -56,6 +56,7 @@ class Scheduler(object):
 
     def create_execution_unit(self):
         self.execution_unit = Execution(alus_units=self.config["alu"]["count"],
+                                        fp_alus_units=self.config["fp_alu"]["count"],
                                         ldsts_units=self.config["ldst"]["count"],
                                         branch_units=self.config["branch"]["count"],
                                         alu_time=self.config["alu"]["time"],

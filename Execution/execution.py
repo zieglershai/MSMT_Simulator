@@ -5,6 +5,7 @@ from random import random
 class Execution(object):
     def __init__(self,
                  alus_units,
+                 fp_alus_units,
                  ldsts_units,
                  branch_units,
                  alu_time,
@@ -18,6 +19,7 @@ class Execution(object):
         This is the execution unit
         """
         self.alus = [0 for _ in range(alus_units)]
+        self.fp_alus = [0 for _ in range(fp_alus_units)]
         self.ldsts = [0 for _ in range(ldsts_units)]
         self.branches = [0 for _ in range(branch_units)]
         self.alu_time = alu_time
@@ -36,6 +38,9 @@ class Execution(object):
         executed = -1
         if instruction_type == InstructionType.ALU:
             if self.execute_for_unit(self.alus, self.alu_time):
+                executed = self.alu_time
+        elif instruction_type == InstructionType.FP_ALU:
+            if self.execute_for_unit(self.fp_alus, self.alu_time):
                 executed = self.alu_time
         elif instruction_type == InstructionType.LDST:
             miss = random() < self.cache_miss_rate
@@ -65,5 +70,6 @@ class Execution(object):
         :return:
         """
         self.alus = [i-1 if i > 0 else i for i in self.alus]
+        self.fp_alus = [i-1 if i > 0 else i for i in self.fp_alus]
         self.ldsts = [i-1 if i > 0 else i for i in self.ldsts]
         self.branches = [i-1 if i > 0 else i for i in self.branches]
