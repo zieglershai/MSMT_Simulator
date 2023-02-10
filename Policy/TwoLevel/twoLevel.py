@@ -19,16 +19,16 @@ class TwoLevel(Policy):
         """
 
         for i, thread_index in enumerate(self.l_one_list):
-            if not threads[thread_index].ready():
+            if not threads[thread_index].ready() or threads[thread_index].check_if_done():
                 self.l_two_list.append(self.l_one_list.pop(i))
                 for j, thread_jindex in enumerate(self.l_two_list):
-                    if threads[thread_jindex].ready():
+                    if threads[thread_jindex].ready() and not threads[thread_jindex].check_if_done():
                         self.l_one_list.append(self.l_two_list.pop(j))
                         threads[thread_jindex].sleep_on_soe_enter_l_one(self.soe_penalty)
                         break
         for i in range(self.num_l_one_threads - len(self.l_one_list)):
             for j, thread_jindex in enumerate(self.l_two_list):
-                if threads[thread_jindex].ready():
+                if threads[thread_jindex].ready() and not threads[thread_jindex].check_if_done():
                     self.l_one_list.append(self.l_two_list.pop(j))
                     threads[thread_jindex].sleep_on_soe_enter_l_one(self.soe_penalty)
                     break

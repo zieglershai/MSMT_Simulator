@@ -158,12 +158,18 @@ class Scheduler(object):
                 print(f"IPC: {total_inst_so_far / self.clock.get_cycle():.4f}")
                 print(f"CPI: {self.clock.get_cycle() / total_inst_so_far:.4f}")
                 print(f"utilization: {100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()):.4f}")
-                print(f"total time: {(time.time() - start) / 60:.2f} minuts")
+                print(f"total time: {(time.time() - start) / 60:.2f} minutes")
                 print("")
 
+        total_inst_so_far = 0
         for i, thread in enumerate(self.threads):
-            print(f"thread {i} finished after {thread.final_cycle}")
+            total_inst_so_far += self.threads[i].instruction
+            print(f"thread {i} finished after {thread.final_cycle} cycles")
         print(f"total number of cycles: {self.clock.get_cycle()}")
+        print(f"IPC: {total_inst_so_far / self.clock.get_cycle():.4f}")
+        print(f"CPI: {self.clock.get_cycle() / total_inst_so_far:.4f}")
+        print(f"utilization: {100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()):.4f}")
+        print(f"total time: {(time.time() - start) / 60:.2f} minutes")
 
     def get_unexecuted_instruction_window_from_thread(self, thread_index: int) -> pd.DataFrame:
         """

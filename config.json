@@ -10,12 +10,12 @@
   "window_size": 4,
   "priority_window_size": 4,
   "threads": {"deepsjeng_count": 0, "fotonik3d": 0, "gcc": 0, "mcf": 0, "perl": 0, "x264": 0,
-    "bwave": 20
+    "bwave": 5
   },
   "policy": "TWOLEVEL",
   "policy_params": {"quanta": 10,
                     "num_l_one_threads":  4,
-                    "num_l_two_threads": 16,
+                    "num_l_two_threads": 1,
                     "soe_penalty": 10
                     },
   "priority_thread": [],
