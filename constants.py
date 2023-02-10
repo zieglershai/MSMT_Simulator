@@ -6,6 +6,7 @@ class InstructionType(Enum):
     LDST = 2
     BRANCH = 3
     MISC = 4
+    FP_ALU = 5
 
 
 class PolicyType(Enum):

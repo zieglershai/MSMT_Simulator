@@ -11,10 +11,21 @@ ALU_OP = ["shl", "bt", "cpuid", "punpcklbw", "mov", "setz", "rol", "por", "psrld
           "not", "pshufd", "pcmpeqb", "sbb", "imul", "mul", "cmovnz", "setnz", "cmovz", "xchg", "sar", "cdqe", "rdtsc",
           "shr", "add", "bsf", "pmovmskb", "psubb", "pslldq", "shl", "pcmpeqb", "or", "test", "lea", "add", "pxor",
           "sub", "and", "cmp", "xor", "neg", "movq", "cmovb", "movsx", "cmovbe", "movaps", "movlpd", "movdqu", "movd",
-           "movsxd", "movdqa", "movups", "movlpd", "movhpd", "movzx", "pcmpeqb"]
+           "movsxd", "movdqa", "movups", "movlpd", "movhpd", "movzx", "pcmpeqb",
+          "fabs", "fadd", "floating", "faddp", "floating", "fchs", "fdiv", "floating", "fdivp", "floating", "fdivr",
+          "floating", "fdivrp", "floating", "fiadd", "fidiv", "fidivr", "fimul", "fisub", "fisubr", "fmul",
+          "floating", "fmulp", "floating", "fprem", "fprem", "frndint", "fscale", "fsqrt", "fsub", "floating",
+          "fsubp", "floating", "fsubr", "floating", "fsubrp", "floating", "fxtract"
+          ]
+FP_ALU_OP = ["fabs", "fadd", "floating", "faddp", "floating", "fchs", "fdiv", "floating", "fdivp", "floating", "fdivr",
+             "floating", "fdivrp", "floating", "fiadd", "fidiv", "fidivr", "fimul", "fisub", "fisubr", "fmul",
+             "floating", "fmulp", "floating", "fprem", "fprem", "frndint", "fscale", "fsqrt", "fsub", "floating",
+             "fsubp", "floating", "fsubr", "floating", "fsubrp", "floating", "fxtract"]
 BR_OP = ["jz", "jnz", "js", "jnbe", "jnb", "jmp", "jnle", "jbe", "jb", "jle", "jns", "jl"]
 LWSW_OP = ["movzx", "pcmpeqb", "mov", "pop", "movq", "cmovb", "movsx", "cmovbe", "movaps", "movlpd", "movdqu", "movd",
-           "movsxd", "movdqa", "movups", "movlpd", "movhpd", "push", ]
+           "movsxd", "movdqa", "movups", "movlpd", "movhpd", "push", "fbld", "fbstp", "fbstp", "fcmovb", "fcmovbe",
+           "fcmove", "fcmovnb", "fcmovnbe", "fcmovne", "fcmovnu", "fcmovu", "fild", "fist", "fistp", "fld", "fst",
+           "fstp", "fxch"]
 # TODO: is jmp a conditional jmp or not?
 # TODO: what is the type of rdtsc ()read time stamp
 # TODO: stosb is displaying a lot in deep trc should we ignore it?
@@ -27,7 +38,7 @@ def main():
     df = pd.DataFrame(columns=[ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE])
 
     warnings.filterwarnings("ignore")
-
+    counter_arr = [0 for _ in range(len(InstructionType))]
     previous_line = ""
     row_id = 0
     chunk_counter = 0
@@ -82,6 +93,8 @@ def main():
             if line == previous_line:  # the last inst went to the mem, now to the calc part
                 if words[1] in ALU_OP:
                     inst_type = InstructionType.ALU
+                    if words[1] in FP_ALU_OP:
+                        inst_type = InstructionType.FP_ALU
                     if words[1] in BR_OP:
                         inst_type = InstructionType.BRANCH
                 same_line_as_before = True
@@ -95,6 +108,8 @@ def main():
                     inst_type = InstructionType.LDST
                 elif words[1] in ALU_OP:
                     inst_type = InstructionType.ALU
+                    if words[1] in FP_ALU_OP:  # check for subtype of instruction
+                        inst_type = InstructionType.FP_ALU
                 elif words[1] in BR_OP:
                     inst_type = InstructionType.BRANCH
 
@@ -135,21 +150,37 @@ def main():
 
             # insert only known instructions into the dataframe
             if inst_type != 4:
+
                 new_row = {ROW_ID: row_id, READ_REG_A: read_reg_a, READ_REG_B: read_reg_b,
                            WRITE_REG: inst_write_reg, INSTRUCTION_TYPE: inst_type}
+                counter_arr[INSTRUCTION_TYPE[inst_type].value] += 1  # increase the counter of the specific instruction
                 df = df.append(new_row, ignore_index=True)
                 row_id += 1
             previous_line = line
 
             if row_id % 10000 == 9999:
+                # log the data frame to avoid over use of the memory
                 with open("output_trc/" + trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
                     # df.set_index(ROW_ID)
                     pickle.dump(df, data_f)
+
+                # print so far statistics:
+                with open("output_trc/" + trc_path.replace(".trc", f"_{chunk_counter}_statistics.txt"), "w+") as file:
+                    for i, op in enumerate(InstructionType):
+                        file.write(f"{op.name}: {counter_arr[i]}\n")
+
                 chunk_counter += 1
                 df = pd.DataFrame(columns=[ROW_ID, READ_REG_A, READ_REG_B, WRITE_REG, INSTRUCTION_TYPE])
+
+    # log the last data frame
     with open("output_trc/" + trc_path.replace(".trc", f"_{chunk_counter}.pkl"), "wb") as data_f:
         # df.set_index(ROW_ID)
         pickle.dump(df, data_f)
+
+    # print the final statistics
+    with open("output_trc/" + trc_path.replace(".trc", f"_end_statistics.txt"), "w+") as file:
+        for i, op in enumerate(InstructionType):
+            file.write(f"{op.name}: {counter_arr[i]}\n")
 
 
 def extract_reg(string: str, arr: list):
