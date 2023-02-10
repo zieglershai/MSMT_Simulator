@@ -4,7 +4,8 @@ import time
 from Execution.execution import Execution
 from Thread.thread import Thread
 import os
-from constants import PolicyType, PolicyTypeError, InstructionType, INSTRUCTION_TYPE, ROW_ID, FINISH_CYCLE
+from constants import PolicyType, PolicyTypeError, InstructionType, INSTRUCTION_TYPE, ROW_ID, FINISH_CYCLE, SINGLE_THREAD_STRING,\
+    TOTAL_CYCLES_STRING, IPC_STRING, CPI_STRING, UTILIZATION_STRING, TOTAL_TIME_STRING
 from Policy.RoundRobbin.roundRobbin import RoundRobbin
 from Policy.TwoLevel.twoLevel import TwoLevel
 import pandas as pd
@@ -162,14 +163,23 @@ class Scheduler(object):
                 print("")
 
         total_inst_so_far = 0
+        FINAL_STRING = ""
         for i, thread in enumerate(self.threads):
             total_inst_so_far += self.threads[i].instruction
             print(f"thread {i} finished after {thread.final_cycle} cycles")
+            FINAL_STRING += SINGLE_THREAD_STRING.format(i, thread.final_cycle)
         print(f"total number of cycles: {self.clock.get_cycle()}")
+        FINAL_STRING += TOTAL_CYCLES_STRING.format(self.clock.get_cycle())
         print(f"IPC: {total_inst_so_far / self.clock.get_cycle():.4f}")
+        FINAL_STRING += IPC_STRING.format(total_inst_so_far / self.clock.get_cycle())
         print(f"CPI: {self.clock.get_cycle() / total_inst_so_far:.4f}")
+        FINAL_STRING += CPI_STRING.format(self.clock.get_cycle() / total_inst_so_far)
         print(f"utilization: {100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()):.4f}")
+        FINAL_STRING += UTILIZATION_STRING.format(100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()))
         print(f"total time: {(time.time() - start) / 60:.2f} minutes")
+        FINAL_STRING += TOTAL_TIME_STRING.format((time.time() - start) / 60)
+
+        return FINAL_STRING
 
     def get_unexecuted_instruction_window_from_thread(self, thread_index: int) -> pd.DataFrame:
         """
