@@ -1,9 +1,12 @@
 import json
+import time
+
 from Execution.execution import Execution
 from Thread.thread import Thread
 import os
 from constants import PolicyType, PolicyTypeError, InstructionType, INSTRUCTION_TYPE, ROW_ID, FINISH_CYCLE
 from Policy.RoundRobbin.roundRobbin import RoundRobbin
+from Policy.TwoLevel.twoLevel import TwoLevel
 import pandas as pd
 from Clock.clock import Clock
 
@@ -34,6 +37,12 @@ class Scheduler(object):
         policy_string = self.config["policy"]
         if policy_string == PolicyType.RR.name:
             self.policy = RoundRobbin(self.thread_count, self.config["policy_params"]["quanta"], self.clock)
+        if policy_string == PolicyType.TWOLEVEL.name:
+            self.policy = TwoLevel(self.config["policy_params"]["num_l_one_threads"],
+                                   self.config["policy_params"]["num_l_two_threads"],
+                                   self.clock,
+                                   self.config["policy_params"]["soe_penalty"])
+
         elif policy_string == PolicyType.PRR.name:
             pass
         else:
@@ -110,7 +119,7 @@ class Scheduler(object):
         ordered by the current priority to get instructions from
         :return:
         """
-        threads_priority_list = self.policy.get_threads_by_priority()
+        threads_priority_list = self.policy.get_threads_by_priority(self.threads)
         return threads_priority_list
 
     def check_if_all_threads_are_done(self):
@@ -125,8 +134,9 @@ class Scheduler(object):
         Main run loop
         :return:
         """
+        start = time.time()
         while not self.check_if_all_threads_are_done():
-            threads_for_cycle = self.policy.get_threads_by_priority()
+            threads_for_cycle = self.get_threads_by_priority()
             for thread_index in threads_for_cycle:
                 instructions = self.get_unexecuted_instruction_window_from_thread(thread_index)
                 for i, row in instructions.iterrows():
@@ -141,8 +151,15 @@ class Scheduler(object):
             self.step()
             if self.clock.get_cycle() % 1000 == 0:
                 print(f"clock is at cycle {self.clock.get_cycle()}")
+                total_inst_so_far = 0
                 for i in range(self.thread_count):
                     print(f"thread {i} progress: {self.threads[i].get_progress():.2f}")
+                    total_inst_so_far += self.threads[i].instruction
+                print(f"IPC: {total_inst_so_far / self.clock.get_cycle():.4f}")
+                print(f"CPI: {self.clock.get_cycle() / total_inst_so_far:.4f}")
+                print(f"utilization: {100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()):.4f}")
+                print(f"total time: {(time.time() - start) / 60:.2f} minuts")
+                print("")
 
         for i, thread in enumerate(self.threads):
             print(f"thread {i} finished after {thread.final_cycle}")

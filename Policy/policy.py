@@ -8,7 +8,7 @@ class Policy(object):
         """
         self.clock = clock
 
-    def get_threads_by_priority(self):
+    def get_threads_by_priority(self, threads=None):
         """
         return a list of indexes of threads ordered by priority
         :return:

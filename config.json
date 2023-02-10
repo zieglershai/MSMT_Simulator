@@ -1,19 +1,23 @@
 {
   "alu": {"time": 1, "count":  4},
-  "branch": {"time": 1, "count":  4},
-  "ldst": {"time": 10, "count":  4},
-  "cache_miss": 0.5,
-  "branch_miss": 0.5,
+  "fp_alu": {"time": 1, "count":  0},
+  "branch": {"time": 1, "count":  2},
+  "ldst": {"time": 1, "count":  4},
+  "cache_miss": 0.1,
+  "branch_miss": 0.1,
   "branch_penalty": 5,
-  "cache_time": 5,
   "mem_penalty": 100,
   "window_size": 4,
   "priority_window_size": 4,
   "threads": {"deepsjeng_count": 0, "fotonik3d": 0, "gcc": 0, "mcf": 0, "perl": 0, "x264": 0,
-    "bwave": 1
+    "bwave": 20
   },
-  "policy": "RR",
-  "policy_params": {"quanta": 10},
+  "policy": "TWOLEVEL",
+  "policy_params": {"quanta": 10,
+                    "num_l_one_threads":  4,
+                    "num_l_two_threads": 16,
+                    "soe_penalty": 10
+                    },
   "priority_thread": [],
   "trace_folder_path": "/Users/ori/git/MSMT_Simulator/Parser/"
 }

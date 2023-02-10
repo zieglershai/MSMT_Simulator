@@ -19,6 +19,7 @@ class Thread(object):
         self.soe_ready_on = 0
         self.instruction = 0
         self.total_instructions = len(self.instructions.index)
+        self.sleep_return = 0
 
     def get_unexecuted_instructions(self):
         """
@@ -26,14 +27,19 @@ class Thread(object):
         :return:
         """
         instruction_window = self.instructions.loc[self.instruction: self.instruction + self.window_size-1].copy()
+        if self.sleep_return > self.clock.get_cycle():
+            return instruction_window.loc[0:-1]
         write_regs = set()
         # TODO: make sure that we are in-order within the window - Yes
         commands = 0
         for i, row in instruction_window.iterrows():
             commands += 1
             # TODO: make sure we need to stop the window after LDST - No only on miss!!!
-            if row[READ_REG_A] in write_regs or row[READ_REG_B] in write_regs or \
-                    row[INSTRUCTION_TYPE] == InstructionType.LDST:
+            # if row[READ_REG_A] in write_regs or row[READ_REG_B] in write_regs or \
+            #         row[INSTRUCTION_TYPE] == InstructionType.LDST:
+            #     break  # Todo break only on miss
+
+            if row[READ_REG_A] in write_regs or row[READ_REG_B] in write_regs:
                 break  # Todo break only on miss
             if row[WRITE_REG] != "":
                 write_regs.add(row[WRITE_REG])
@@ -87,6 +93,9 @@ class Thread(object):
         :return:
         """
         self.soe_ready_on = self.clock.get_cycle() + cycle
+
+    def sleep_on_soe_enter_l_one(self, penalty):
+        self.sleep_return = self.clock.get_cycle() + penalty
 
     def ready(self):
         """

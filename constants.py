@@ -12,6 +12,7 @@ class InstructionType(Enum):
 class PolicyType(Enum):
     RR = 1
     PRR = 2
+    TWOLEVEL = 3
 
 
 class InstructionError(Exception):

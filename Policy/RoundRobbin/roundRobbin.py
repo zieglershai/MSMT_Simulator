@@ -9,7 +9,7 @@ class RoundRobbin(Policy):
         self.quanta = quanta
         self.priority_list = [i for i in range(num_threads)]
 
-    def get_threads_by_priority(self):
+    def get_threads_by_priority(self, threads=None):
         """
         return a list with one thread index to run
         :return:
