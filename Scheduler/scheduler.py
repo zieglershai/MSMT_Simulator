@@ -24,6 +24,7 @@ class Scheduler(object):
         self.policy = None
         self.priority_thread_indexes = []
         self.clock = Clock()
+        self.clock.reset()
 
         self.parse_input(config_file_path)
         self.create_threads()

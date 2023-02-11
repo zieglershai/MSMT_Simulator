@@ -28,3 +28,6 @@ class Clock(metaclass=SingletonMeta):
 
     def step(self):
         self.__cycle += 1
+
+    def reset(self):
+        self.__cycle = 0
