@@ -153,7 +153,7 @@ def main():
 
                 new_row = {ROW_ID: row_id, READ_REG_A: read_reg_a, READ_REG_B: read_reg_b,
                            WRITE_REG: inst_write_reg, INSTRUCTION_TYPE: inst_type}
-                counter_arr[INSTRUCTION_TYPE[inst_type].value] += 1  # increase the counter of the specific instruction
+                counter_arr[InstructionType[inst_type.name].value-1] += 1  # increase the counter of the specific instruction
                 df = df.append(new_row, ignore_index=True)
                 row_id += 1
             previous_line = line
