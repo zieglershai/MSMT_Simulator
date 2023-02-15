@@ -16,7 +16,9 @@
   "policy_params": {"quanta": 10,
                     "num_l_one_threads":  4,
                     "num_l_two_threads": 16,
-                    "soe_penalty": 10
+                    "soe_penalty": 10,
+                    "prefetch_threads": 1,
+                    "prefetch_cycles": 7
                     },
   "priority_thread": [],
   "trace_folder_path": "/Users/ori/git/MSMT_Simulator/Parser/"

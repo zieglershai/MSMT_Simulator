@@ -30,11 +30,11 @@ class Thread(object):
         if self.sleep_return > self.clock.get_cycle():
             return instruction_window.loc[0:-1]
         write_regs = set()
-        # TODO: make sure that we are in-order within the window - Yes
+        # TODO: make sure that we are in-order within the window_ooo - Yes
         commands = 0
         for i, row in instruction_window.iterrows():
             commands += 1
-            # TODO: make sure we need to stop the window after LDST - No only on miss!!!
+            # TODO: make sure we need to stop the window_ooo after LDST - No only on miss!!!
             # if row[READ_REG_A] in write_regs or row[READ_REG_B] in write_regs or \
             #         row[INSTRUCTION_TYPE] == InstructionType.LDST:
             #     break  # Todo break only on miss
@@ -104,3 +104,9 @@ class Thread(object):
         """
         return self.soe_ready_on <= self.clock.get_cycle()
 
+    def prefetch(self, prefetch_cycles: int):
+        """
+
+        :return: true if the thread is prefetcehd
+        """
+        return self.soe_ready_on + prefetch_cycles <= self.clock.get_cycle()

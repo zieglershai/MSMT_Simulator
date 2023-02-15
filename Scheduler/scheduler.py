@@ -4,10 +4,12 @@ import time
 from Execution.execution import Execution
 from Thread.thread import Thread
 import os
-from constants import PolicyType, PolicyTypeError, InstructionType, INSTRUCTION_TYPE, ROW_ID, FINISH_CYCLE, SINGLE_THREAD_STRING,\
+from constants import PolicyType, PolicyTypeError, InstructionType, INSTRUCTION_TYPE, ROW_ID, FINISH_CYCLE, \
+    SINGLE_THREAD_STRING, \
     TOTAL_CYCLES_STRING, IPC_STRING, CPI_STRING, UTILIZATION_STRING, TOTAL_TIME_STRING
 from Policy.RoundRobbin.roundRobbin import RoundRobbin
 from Policy.TwoLevel.twoLevel import TwoLevel
+from Policy.PreFetchTwoLevel.preFetchTwoLevel import PreFetchTwoLevel
 import pandas as pd
 from Clock.clock import Clock
 
@@ -39,12 +41,18 @@ class Scheduler(object):
         policy_string = self.config["policy"]
         if policy_string == PolicyType.RR.name:
             self.policy = RoundRobbin(self.thread_count, self.config["policy_params"]["quanta"], self.clock)
-        if policy_string == PolicyType.TWOLEVEL.name:
+        elif policy_string == PolicyType.TWOLEVEL.name:
             self.policy = TwoLevel(self.config["policy_params"]["num_l_one_threads"],
                                    self.config["policy_params"]["num_l_two_threads"],
                                    self.clock,
                                    self.config["policy_params"]["soe_penalty"])
-
+        elif policy_string == PolicyType.PREFETCHTWOLEVEL.name:
+            self.policy = PreFetchTwoLevel(self.config["policy_params"]["num_l_one_threads"],
+                                           self.config["policy_params"]["num_l_two_threads"],
+                                           self.config["policy_params"]["prefetch_threads"],
+                                           self.clock,
+                                           self.config["policy_params"]["soe_penalty"],
+                                           self.config["policy_params"]["prefetch_cycles"])
         elif policy_string == PolicyType.PRR.name:
             pass
         else:
@@ -54,7 +62,7 @@ class Scheduler(object):
         """
         Parse the config:
             set:
-                1. window size
+                1. window_ooo size
                 2. penalties
                 3. execution units - number and latency
                 4. miss rate
@@ -147,8 +155,10 @@ class Scheduler(object):
                     instruction_id = row[ROW_ID]
                     if num_cycles != -1:
                         self.set_instruction_ran_on_thread(thread_index, instruction_id, num_cycles)
-                    if cache_miss:  # if there was a miss switch on event is required
-                        self.threads[thread_index].set_cache_miss(num_cycles)
+                        if cache_miss:  # if there was a miss switch on event is required
+                            self.threads[thread_index].set_cache_miss(num_cycles)
+                            break
+                    else:
                         break
             self.step()
             if self.clock.get_cycle() % 1000 == 0:
@@ -176,7 +186,8 @@ class Scheduler(object):
         print(f"CPI: {self.clock.get_cycle() / total_inst_so_far:.4f}")
         FINAL_STRING += CPI_STRING.format(self.clock.get_cycle() / total_inst_so_far)
         print(f"utilization: {100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()):.4f}")
-        FINAL_STRING += UTILIZATION_STRING.format(100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()))
+        FINAL_STRING += UTILIZATION_STRING.format(
+            100 * (self.execution_unit.used_percentage_sum / self.clock.get_cycle()))
         print(f"total time: {(time.time() - start) / 60:.2f} minutes")
         FINAL_STRING += TOTAL_TIME_STRING.format((time.time() - start) / 60)
 
@@ -184,7 +195,7 @@ class Scheduler(object):
 
     def get_unexecuted_instruction_window_from_thread(self, thread_index: int) -> pd.DataFrame:
         """
-        get a window of of instructions that can be run
+        get a window_ooo of of instructions that can be run
         :param thread_index: index of the thread
         :return: (int, enum)
         """

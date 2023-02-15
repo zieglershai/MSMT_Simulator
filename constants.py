@@ -13,6 +13,7 @@ class PolicyType(Enum):
     RR = 1
     PRR = 2
     TWOLEVEL = 3
+    PREFETCHTWOLEVEL = 4
 
 
 class InstructionError(Exception):
